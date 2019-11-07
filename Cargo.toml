@@ -1,0 +1,32 @@
+[package]
+name = "nature_demo_converter_restful"
+version = "0.0.1"
+authors = ["XueBin Li <llxxbb@yeah.net>"]
+edition = "2018"
+description = "A rustful converter for Nature-Demo"
+repository = "https://github.com/llxxbb/Nature-Demo-Converter-Restful"
+readme = "README.md"
+license = "MIT"
+keywords = ["nature", "demo", "restful"]
+workspace = "../Nature"
+
+[dependencies]
+# normal
+chrono = { version = "0.4", features = ["serde"] }
+serde_json = "1.0"
+serde = "1.0"
+serde_derive = "1.0"
+lazy_static = "1.4"
+uuid = { version = "0.7", features = ["v3"] }
+
+#config
+dotenv = "0.11"
+
+# web
+reqwest = "0.9"
+actix-web = "1.0"
+actix = "0.8"
+
+# self project group
+nature_common = {path = "../Nature-Common", version="0.0.2"}
+

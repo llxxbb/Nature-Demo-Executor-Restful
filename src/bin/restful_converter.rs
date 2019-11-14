@@ -31,7 +31,7 @@ fn send_to_warehouse_thread(para: ConverterParameter) {
     thread::sleep(Duration::new(0, 50000));
     // send result to Nature
     let rtn = DelayedInstances {
-        carrier_id: para.carrier_id,
+        task_id: para.task_id,
         result: ConverterReturned::Instances(vec![para.from]),
     };
     let rtn = CLIENT.post(&*NATURE_CALLBACK_ADDRESS).json(&rtn).send();

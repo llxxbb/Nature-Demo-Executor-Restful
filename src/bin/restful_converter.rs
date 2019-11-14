@@ -32,10 +32,15 @@ fn send_to_warehouse_thread(para: ConverterParameter) {
     // send result to Nature
     let rtn = DelayedInstances {
         carrier_id: para.carrier_id,
-        result: ConverterReturned::None,
+        result: ConverterReturned::Instances(vec![para.from]),
     };
-    let _ = CLIENT.post(&*NATURE_CALLBACK_ADDRESS).json(&rtn).send();
-    debug!("warehouse business processed!")
+    let rtn = CLIENT.post(&*NATURE_CALLBACK_ADDRESS).json(&rtn).send();
+    let text: String = rtn.unwrap().text().unwrap();
+    if text.contains("Err") {
+        error!("{}", text);
+    } else {
+        debug!("warehouse business processed!")
+    }
 }
 
 

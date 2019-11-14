@@ -13,7 +13,7 @@ use actix_web::web::Json;
 use dotenv::dotenv;
 use reqwest::Client;
 
-use nature_common::{ConverterParameter, ConverterReturned, setup_logger};
+use nature_common::{ConverterParameter, ConverterReturned, DelayedInstances, setup_logger};
 
 lazy_static! {
     static ref CLIENT : Client = Client::new();
@@ -26,14 +26,15 @@ fn send_to_warehouse(para: Json<ConverterParameter>) -> HttpResponse {
     HttpResponse::Ok().json(ConverterReturned::Delay(60))
 }
 
-fn send_to_warehouse_thread(_para: ConverterParameter) {
+fn send_to_warehouse_thread(para: ConverterParameter) {
     // wait 50ms
     thread::sleep(Duration::new(0, 50000));
     // send result to Nature
-//    let rtn = DelayedInstances{
-//
-//    };
-    let _ = CLIENT.post(&*NATURE_CALLBACK_ADDRESS).json(&ConverterReturned::None).send();
+    let rtn = DelayedInstances {
+        carrier_id: para.carrier_id,
+        result: ConverterReturned::None,
+    };
+    let _ = CLIENT.post(&*NATURE_CALLBACK_ADDRESS).json(&rtn).send();
     debug!("warehouse business processed!")
 }
 

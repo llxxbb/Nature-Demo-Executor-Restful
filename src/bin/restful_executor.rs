@@ -11,7 +11,7 @@ use std::time::Duration;
 use actix_web::{App, HttpResponse, HttpServer, web};
 use actix_web::web::Json;
 use dotenv::dotenv;
-use reqwest::Client;
+use reqwest::blocking::Client;
 
 use nature_common::{ConverterParameter, ConverterReturned, DelayedInstances, setup_logger};
 

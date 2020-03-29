@@ -20,7 +20,7 @@ lazy_static! {
     static ref NATURE_CALLBACK_ADDRESS: String = env::var("NATURE_CALLBACK_ADDRESS").unwrap_or_else(|_| "http://localhost:8080/callback".to_string());
 }
 
-fn send_to_warehouse(para: Json<ConverterParameter>) -> HttpResponse {
+async fn send_to_warehouse(para: Json<ConverterParameter>) -> HttpResponse {
     thread::spawn(move || send_to_warehouse_thread(para.0));
     // wait 60 seconds to simulate the process of warehouse business.
     HttpResponse::Ok().json(ConverterReturned::Delay(60))
@@ -44,7 +44,8 @@ fn send_to_warehouse_thread(para: ConverterParameter) {
 }
 
 
-fn main() {
+#[actix_rt::main]
+async fn main() -> std::io::Result<()> {
     dotenv().ok();
     let _ = setup_logger();
     let port = env::var("DEMO_CONVERTER_PORT").unwrap_or_else(|_| "8082".to_string());
@@ -52,7 +53,7 @@ fn main() {
         || App::new()
             .route("/send_to_warehouse", web::post().to(send_to_warehouse)))
         .bind("127.0.0.1:".to_owned() + &port).unwrap()
-        .run().unwrap();
+        .run().await
 }
 
 

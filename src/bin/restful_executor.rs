@@ -1,8 +1,10 @@
 extern crate dotenv;
+extern crate futures;
 #[macro_use]
 extern crate lazy_static;
 #[macro_use]
 extern crate log;
+extern crate reqwest;
 
 use std::env;
 use std::thread;
@@ -56,5 +58,61 @@ async fn main() -> std::io::Result<()> {
         .run().await
 }
 
+#[cfg(test)]
+mod actix_web_test {
+    use actix_web::client::Client;
+    use actix_web::Error;
+    use futures::executor::block_on;
 
+    use nature_common::{ConverterParameter, ConverterReturned};
 
+    #[test]
+    fn actix_client_test() {
+        // TODO failed, need to fix
+        // System is not running
+        // thread 'actix_web_test::actix_client_test' panicked at 'System is not running', /rustc/75208942f6144daac669e8e382029fc33bdce841\src\libstd\macros.rs:13:23
+        let _rtn = block_on(http_call());
+    }
+
+    async fn http_call() -> Result<(), Error> {
+        let para = ConverterParameter {
+            from: Default::default(),
+            last_state: None,
+            task_id: vec![],
+            master: None,
+            cfg: None,
+        };
+
+        let client = Client::new();
+        let rtn = client.post("http://localhost:8082/send_to_warehouse").send_json(&para).await?.json::<ConverterReturned>().await?;
+        dbg!(rtn);
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod reqwest_test {
+    use reqwest::{Client, Error};
+    use tokio::runtime::Runtime;
+
+    use nature_common::{ConverterParameter, ConverterReturned};
+
+    #[test]
+    fn reqwest_test() {
+        let _rtn = Runtime::new().unwrap().block_on(http_call());
+    }
+
+    async fn http_call() -> Result<(), Error> {
+        let para = ConverterParameter {
+            from: Default::default(),
+            last_state: None,
+            task_id: vec![],
+            master: None,
+            cfg: None,
+        };
+        let client = Client::new();
+        let rtn = client.post("http://localhost:8082/send_to_warehouse").json(&para).send().await?.json::<ConverterReturned>().await?;
+        dbg!(rtn);
+        Ok(())
+    }
+}

@@ -80,7 +80,7 @@ mod actix_web_test {
             last_state: None,
             task_id: vec![],
             master: None,
-            cfg: None,
+            cfg: "".to_string(),
         };
 
         let client = Client::new();
@@ -108,7 +108,7 @@ mod reqwest_test {
             last_state: None,
             task_id: vec![],
             master: None,
-            cfg: None,
+            cfg: "".to_string(),
         };
         let client = Client::new();
         let rtn = client.post("http://localhost:8082/send_to_warehouse").json(&para).send().await?.json::<ConverterReturned>().await?;

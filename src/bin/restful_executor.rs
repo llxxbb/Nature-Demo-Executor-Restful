@@ -7,6 +7,7 @@ extern crate log;
 extern crate reqwest;
 
 use std::env;
+use std::str::FromStr;
 use std::thread;
 use std::time::Duration;
 
@@ -15,7 +16,7 @@ use actix_web::web::Json;
 use dotenv::dotenv;
 use reqwest::blocking::Client;
 
-use nature_common::{ConverterParameter, ConverterReturned, DelayedInstances, setup_logger};
+use nature_common::{ConverterParameter, ConverterReturned, DelayedInstances, Instance, Result, setup_logger};
 
 lazy_static! {
     static ref CLIENT : Client = Client::new();
@@ -26,6 +27,18 @@ async fn send_to_warehouse(para: Json<ConverterParameter>) -> HttpResponse {
     thread::spawn(move || send_to_warehouse_thread(para.0));
     // wait 60 seconds to simulate the process of warehouse business.
     HttpResponse::Ok().json(ConverterReturned::Delay(60))
+}
+
+async fn add_score(para: Json<Vec<Instance>>) -> HttpResponse {
+    let mut rtn = para.0;
+    rtn.iter_mut().for_each(|one| {
+        if one.para.contains("subject2") {
+            let points = u16::from_str(&one.content).unwrap();
+            let content = (points + 4).to_string();
+            one.data.content = content;
+        }
+    });
+    HttpResponse::Ok().json(Ok(rtn) as Result<Vec<Instance>>)
 }
 
 fn send_to_warehouse_thread(para: ConverterParameter) {
@@ -53,41 +66,10 @@ async fn main() -> std::io::Result<()> {
     let port = env::var("DEMO_CONVERTER_PORT").unwrap_or_else(|_| "8082".to_string());
     HttpServer::new(
         || App::new()
-            .route("/send_to_warehouse", web::post().to(send_to_warehouse)))
+            .route("/send_to_warehouse", web::post().to(send_to_warehouse))
+            .route("/add_score", web::post().to(add_score)))
         .bind("127.0.0.1:".to_owned() + &port).unwrap()
         .run().await
-}
-
-#[cfg(test)]
-mod actix_web_test {
-    use actix_web::client::Client;
-    use actix_web::Error;
-    use futures::executor::block_on;
-
-    use nature_common::{ConverterParameter, ConverterReturned};
-
-    #[test]
-    fn actix_client_test() {
-        // TODO failed, need to fix
-        // System is not running
-        // thread 'actix_web_test::actix_client_test' panicked at 'System is not running', /rustc/75208942f6144daac669e8e382029fc33bdce841\src\libstd\macros.rs:13:23
-        let _rtn = block_on(http_call());
-    }
-
-    async fn http_call() -> Result<(), Error> {
-        let para = ConverterParameter {
-            from: Default::default(),
-            last_state: None,
-            task_id: vec![],
-            master: None,
-            cfg: "".to_string(),
-        };
-
-        let client = Client::new();
-        let rtn = client.post("http://localhost:8082/send_to_warehouse").send_json(&para).await?.json::<ConverterReturned>().await?;
-        dbg!(rtn);
-        Ok(())
-    }
 }
 
 #[cfg(test)]

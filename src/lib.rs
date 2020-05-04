@@ -9,7 +9,7 @@ use std::str::FromStr;
 use actix_web::{App, HttpResponse, HttpServer, web};
 use actix_web::dev::Server;
 use actix_web::web::Json;
-use reqwest::blocking::Client;
+use reqwest::Client;
 
 use nature_common::{ConverterParameter, ConverterReturned, Instance, Result};
 
@@ -41,7 +41,7 @@ async fn add_score(para: Json<Vec<Instance>>) -> HttpResponse {
 }
 
 async fn order_to_item(p: Json<ConverterParameter>) -> HttpResponse {
-    HttpResponse::Ok().json(make_order_item(p.0))
+    HttpResponse::Ok().json(make_order_item(p.0).await)
 }
 
 pub fn start_actrix() -> Server {

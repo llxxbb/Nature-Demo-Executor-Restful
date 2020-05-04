@@ -2,16 +2,18 @@ use nature_common::{Instance, KeyCondition, Result};
 
 use super::{CLIENT, GET_BY_META};
 
-pub fn get_by_meta(cond: &KeyCondition) -> Result<Vec<Instance>> {
+pub async fn get_by_meta(cond: &KeyCondition) -> Result<Vec<Instance>> {
     // let rtn = CLIENT.post(&*GET_BY_META).json(cond).send().await?.json::<ConverterReturned>().await?;
-    let res = CLIENT.post(&*GET_BY_META).json(cond).send()?;
-    let rtn = res.json::<Result<Vec<Instance>>>()?;
+    let res = CLIENT.post(&*GET_BY_META).json(cond).send().await?;
+    let rtn = res.json::<Result<Vec<Instance>>>().await?;
     // let _ = dbg!(&rtn);
     rtn
 }
 
 #[cfg(test)]
 mod test {
+    use tokio::runtime::Runtime;
+
     use super::*;
 
     #[test]
@@ -26,7 +28,8 @@ mod test {
             time_lt: None,
             limit: 100,
         };
-        let result = get_by_meta(&para);
+        let mut rt = Runtime::new().unwrap();
+        let result = rt.block_on(get_by_meta(&para));
         let _ = dbg!(result);
     }
 }

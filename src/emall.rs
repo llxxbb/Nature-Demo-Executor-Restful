@@ -1,9 +1,15 @@
 use std::thread;
 use std::time::Duration;
 
+use reqwest::blocking::Client;
+
 use nature_common::{ConverterParameter, ConverterReturned, DelayedInstances};
 
-use crate::{CLIENT, CALLBACK_ADDRESS};
+use crate::CALLBACK_ADDRESS;
+
+lazy_static! {
+    pub static ref CLIENT : Client = Client::new();
+}
 
 pub fn send_to_warehouse_thread(para: ConverterParameter) {
     // wait 50ms

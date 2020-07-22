@@ -19,7 +19,7 @@ use crate::sale::make_order_item;
 lazy_static! {
     pub static ref CLIENT : Client = Client::new();
     pub static ref CALLBACK_ADDRESS: String = "http://localhost:8080/callback".to_string();
-    pub static ref GET_BY_META: String = "http://localhost:8080/get_by_key_gt".to_string();
+    pub static ref GET_BY_META: String = "http://localhost:8080/get_by_key_range".to_string();
 }
 
 async fn send_to_warehouse(para: Json<ConverterParameter>) -> HttpResponse {

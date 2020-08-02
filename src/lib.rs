@@ -14,7 +14,6 @@ use reqwest::Client;
 use nature_common::{ConverterParameter, ConverterReturned, Instance, Result};
 
 use crate::emall::send_to_warehouse_thread;
-use crate::sale::make_order_item;
 
 lazy_static! {
     pub static ref CLIENT : Client = Client::new();
@@ -40,21 +39,15 @@ async fn add_score(para: Json<Vec<Instance>>) -> HttpResponse {
     HttpResponse::Ok().json(Ok(rtn) as Result<Vec<Instance>>)
 }
 
-async fn order_to_item(p: Json<ConverterParameter>) -> HttpResponse {
-    HttpResponse::Ok().json(make_order_item(p.0).await)
-}
-
 pub fn start_actrix() -> Server {
     let port = env::var("DEMO_CONVERTER_PORT").unwrap_or_else(|_| "8082".to_string());
     HttpServer::new(
         || App::new()
             .route("/send_to_warehouse", web::post().to(send_to_warehouse))
             .route("/add_score", web::post().to(add_score))
-            .route("/order_to_item", web::post().to(order_to_item)))
-        .bind("127.0.0.1:".to_owned() + &port).unwrap()
+    ).bind("127.0.0.1:".to_owned() + &port).unwrap()
         .run()
 }
 
 pub mod emall;
-pub mod sale;
 pub mod tool;

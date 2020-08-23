@@ -1,6 +1,6 @@
 [package]
 name = "nature_demo_executor_restful"
-version = "0.14.0"
+version = "0.14.1"
 authors = ["XueBin Li <llxxbb@yeah.net>"]
 edition = "2018"
 description = "A rustful converter for Nature-Demo"
@@ -31,6 +31,6 @@ actix-rt = "1.0"
 tokio = { version = "0.2", features = ["full"] }
 
 # self project group
-nature_common = {path = "../Nature-Common", version = "0.14.0"}
-nature_demo_common = {path = "../Nature-Demo-Common", version = "0.14.0"}
+nature_common = {path = "../Nature-Common", version = "0.14.1"}
+nature_demo_common = {path = "../Nature-Demo-Common", version = "0.14.1"}
 
